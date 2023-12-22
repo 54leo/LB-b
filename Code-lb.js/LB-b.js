@@ -1,19 +1,15 @@
+//got help from chatGPT if code didnt work correctly
+//got help form old codes
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-undef
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
 
 const app = express();
 const port = 8080;
 
 app.use(bodyParser.json());
 
-app.use(cors({
-	origin: 'http://localhost:8080',
-	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-	credentials: true,
-}));
 //the whole array was created by chatGPT
 let tasks = [
 	{ task: 'Einkauf erledigen', autor: 'Max Mustermann', creaDate: '2023-01-15', finDate: '2023-01-18' },
@@ -34,7 +30,7 @@ app.get('/tasks', (req, res) => {
 
 app.post('/tasks', (req, res) => {
 	const { task, autor, creaDate, finDate } = req.body;
-
+	//checks if every part of the task is given
 	if (!task || !autor || !creaDate || !finDate) {
 		return res.status(400).json({ error: 'All fields are required' });
 	}
@@ -48,24 +44,24 @@ app.post('/tasks', (req, res) => {
 	};
 
 	tasks.push(newTask);
-	res.status(201).json({ message: 'Task created successfully', task: newTask });
+	res.status(201).json({ message: 'Task created', task: newTask });
 });
-
+//gets the information from the user and checks if they are available
 app.get('/tasks/:id', (req, res) => {
 	const taskId = parseInt(req.params.id);
 	const task = tasks.find(task => task.id === taskId);
-
+	//if this task doesnt exist the status code 404 gets printed
 	if (!task) {
 		return res.status(404).json({ error: 'Task not found' });
 	}
 
 	res.json({ task });
 });
-
+//changes an information of the task 
 app.patch('/tasks/:id', (req, res) => {
 	const keys = Object.keys(req.body);
 	const changeTask = tasks.find(task => task.id === parseInt(req.params.id));
-
+	// if the task doesnt get changed the status code 404 gets printed
 	if (!changeTask) {
 		return res.status(404).json({ error: 'Task not found' });
 	}
@@ -74,15 +70,17 @@ app.patch('/tasks/:id', (req, res) => {
 		changeTask[key] = req.body[key];
 	});
 
-	res.json({ message: 'Task updated successfully', task: changeTask });
+	res.json({ message: 'Task updated', task: changeTask });
 });
-
+//deletes a task of the arrays
 app.delete('/tasks/:id', (req, res) => {
 	const taskId = parseInt(req.params.id);
 	tasks = tasks.filter(task => task.id !== taskId);
-	res.json({ message: 'Task deleted successfully', tasks });
+	res.json({ message: 'Task deleted', tasks });
 });
 
 app.listen(port, () => {
 	console.log(`Bookstore app listening on port ${port}`);
 });
+
+
